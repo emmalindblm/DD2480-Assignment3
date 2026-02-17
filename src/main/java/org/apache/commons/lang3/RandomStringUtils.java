@@ -254,48 +254,75 @@ public class RandomStringUtils {
      */
     public static String random(int count, int start, int end, final boolean letters, final boolean digits,
             final char[] chars, final Random random) {
+        // Branch 1: count == 0
         if (count == 0) {
             return StringUtils.EMPTY;
-        }
+        } // Branch 2: count != 0 (implicit)
+
+        // Branch 3: count < 0
         if (count < 0) {
             throw new IllegalArgumentException("Requested random string length " + count + " is less than 0.");
-        }
+        } // Branch 4: count > 0 (implicit)
+
+        // Branch 5: chars != null && chars.length == 0
         if (chars != null && chars.length == 0) {
             throw new IllegalArgumentException("The chars array must not be empty");
-        }
+        } // Branch 6: !(chars != null && chars.length == 0) (implicit)
+
+        // Branch 7: start == 0 && end == 0
         if (start == 0 && end == 0) {
+
+            // Branch 8: chars != null
             if (chars != null) {
                 end = chars.length;
+
+            // Branch 9: !letters && !digits
             } else if (!letters && !digits) {
                 end = Character.MAX_CODE_POINT;
+
+            // Branch 10: else
             } else {
                 end = 'z' + 1;
                 start = ' ';
             }
+        
+        // Branch 11: end <= start
         } else if (end <= start) {
             throw new IllegalArgumentException("Parameter end (" + end + ") must be greater than start (" + start + ")");
+        
+        // Branch 12: start < 0 || end < 0
         } else if (start < 0 || end < 0) {
             throw new IllegalArgumentException("Character positions MUST be >= 0");
         }
+        // Branch 13: implicit else for branch 7,11,12
+
+        // Branch 14: end > Character.MAX_CODE_POINT
         if (end > Character.MAX_CODE_POINT) {
             // Technically, it should be `Character.MAX_CODE_POINT+1` as `end` is excluded
             // But the character `Character.MAX_CODE_POINT` is private use, so it would anyway be excluded
             end = Character.MAX_CODE_POINT;
-        }
+        } // Branch 15: end <= Character.MAX_CODE_POINT (implicit)
+
         // Optimizations and tests when chars == null and using ASCII characters (end <= 0x7f)
+        // Branch 16: chars == null && end <= 0x7f 
         if (chars == null && end <= 0x7f) {
             // Optimize generation of full alphanumerical characters
             // Normally, we would need to pick a 7-bit integer, since gap = 'z' - '0' + 1 = 75 > 64
             // In turn, this would make us reject the sampling with probability 1 - 62 / 2^7 > 1 / 2
             // Instead we can pick directly from the right set of 62 characters, which requires
             // picking a 6-bit integer and only rejecting with probability 2 / 64 = 1 / 32
+            
+            // Branch 17: letters && digits && start <= ASCII_0 && end >= ASCII_z + 1
             if (letters && digits && start <= ASCII_0 && end >= ASCII_z + 1) {
                 return random(count, 0, 0, false, false, ALPHANUMERICAL_CHARS, random);
-            }
+            } // Branch 18: !(letters && digits && start <= ASCII_0 && end >= ASCII_z + 1) (implicit)
+
+            // Branch 19: digits && end <= ASCII_0 || letters && end <= ASCII_A
             if (digits && end <= ASCII_0 || letters && end <= ASCII_A) {
                 throw new IllegalArgumentException("Parameter end (" + end + ") must be greater than (" + ASCII_0 + ") for generating digits "
                         + "or greater than (" + ASCII_A + ") for generating letters.");
-            }
+            } // Branch 20: !(digits && end <= ASCII_0 || letters && end <= ASCII_A) (implicit)
+
             // Optimize start and end when filtering by letters and/or numbers:
             // The range provided may be too large since we filter anyway afterward.
             // Note the use of Math.min/max (as opposed to setting start to '0' for example),
@@ -304,39 +331,64 @@ public class RandomStringUtils {
             // needs to stay equal to '1' in that case.
             // Note that because of the above test, we will always have start < end
             // even after this optimization.
+            
+            // Branch 21: letters && digits
             if (letters && digits) {
                 start = Math.max(ASCII_0, start);
                 end = Math.min(ASCII_z + 1, end);
+            
+            // Branch 22: digits
             } else if (digits) {
                 // just numbers, no letters
                 start = Math.max(ASCII_0, start);
                 end = Math.min(ASCII_9 + 1, end);
+
+            // Branch 23: letters
             } else if (letters) {
                 // just letters, no numbers
                 start = Math.max(ASCII_A, start);
                 end = Math.min(ASCII_z + 1, end);
             }
-        }
+            // Branch 24: implicit else for branch 21,22,23
+        } // Branch 25: !(chars == null && end <= 0x7f) (implicit)
+
+        // Branch 26: letters && !digits
         if (letters && !digits) {
+
+            // Branch 27: for loop entered i < end
+            // Branch 28: for looped skipped i >= end (implicit)
             for (int i = start; i < end; i++) {
+
+                // Branch 29: Character.isLetter(i)
                 if (Character.isLetter(i)) {
                     break;
-                }
+                } // Branch 30: !(Character.isLetter(i)) (implicit)
+
+                // Branch 31: i == end - 1
                 if (i == end - 1) {
                     throw new IllegalArgumentException(String.format("No letters exist between start %,d and end %,d.", start, end));
-                }
-            }
-        }
+                } // Branch 32: i != end - 1 (implicit)
+            } 
+        } // Branch 33: !(letters && !digits)
+
+        // Branch 34: !letters && digits
         if (!letters && digits) {
+
+            // Branch 35: for loop entered i < end
+            // Branch 36: for loop skipped i >= end
             for (int i = start; i < end; i++) {
+
+                // Branch 37: Character.isDigit(i)
                 if (Character.isDigit(i)) {
                     break;
-                }
+                } // Branch 38: !(Character.isDigit(i)) (implicit)
+
+                // Branch 39: i == end - 1
                 if (i == end - 1) {
                     throw new IllegalArgumentException(String.format("No digits exist between start %,d and end %,d.", start, end));
-                }
+                } // Branch 40: i != end - 1 (implicit)
             }
-        }
+        } // Branch 41: !(!letters && digits) (implicit)
         final StringBuilder builder = new StringBuilder(count);
         final int gap = end - start;
         final int gapBits = Integer.SIZE - Integer.numberOfLeadingZeros(gap);
@@ -355,37 +407,56 @@ public class RandomStringUtils {
         final long desiredCacheSize = ((long) count * gapBits + CACHE_PADDING_BITS) / BITS_TO_BYTES_DIVISOR + BASE_CACHE_SIZE_PADDING;
         final int cacheSize = (int) Math.min(desiredCacheSize, Integer.MAX_VALUE / BITS_TO_BYTES_DIVISOR + BASE_CACHE_SIZE_PADDING);
         final CachedRandomBits arb = new CachedRandomBits(cacheSize, random);
+        
+        // Branch 42: while loop entered count != 0
+        // Branch 43: while loop skipped count == 0
         while (count-- != 0) {
             // Generate a random value between start (included) and end (excluded)
             final int randomValue = arb.nextBits(gapBits) + start;
+            
             // Rejection sampling if value too large
+            // Branch 44: randomValue >= end
             if (randomValue >= end) {
                 count++;
                 continue;
-            }
+            } // Branch 45: randomValue < end (implicit)
             final int codePoint;
+
+            // Branch 46: chars == null
             if (chars == null) {
                 codePoint = randomValue;
                 switch (Character.getType(codePoint)) {
+                
+                // Branch 47: any of the case
                 case Character.UNASSIGNED:
                 case Character.PRIVATE_USE:
                 case Character.SURROGATE:
                     count++;
                     continue;
-                }
+                } // Branch 48: none of the case (implicit)
+            
+            // Branch 49: else
             } else {
                 codePoint = chars[randomValue];
             }
             final int numberOfChars = Character.charCount(codePoint);
+
+            // Branch 50: count == 0 && numberOfChars > 1
             if (count == 0 && numberOfChars > 1) {
                 count++;
                 continue;
-            }
+            } // Branch 51: !(count == 0 && numberOfChars > 1) (implicit)
+
+            // Branch 52: letters && Character.isLetter(codePoint) || digits && Character.isDigit(codePoint) || !letters && !digits
             if (letters && Character.isLetter(codePoint) || digits && Character.isDigit(codePoint) || !letters && !digits) {
                 builder.appendCodePoint(codePoint);
+
+                // Branch 53: numberOfChars == 2
                 if (numberOfChars == 2) {
                     count--;
-                }
+                } // Branch 54: numberOfChars != 2 (implicit)
+            
+            // Branch 55: else
             } else {
                 count++;
             }
