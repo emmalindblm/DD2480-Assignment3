@@ -446,4 +446,36 @@ class FastDatePrinterTest extends AbstractLangTest {
         assertEquals("2021", printer4DigitAnotherFallback.format(cal));
         assertEquals("21", printer2Digits.format(cal));
     }
+
+    @Test
+    void testParsePatternEmptyPattern() {
+        // empty pattern should format to empty string.
+        //
+        // note: the tokenLen == 0 guard inside parsePattern is dead code
+        // parseToken always returns at least one character, making it unreachable.
+        final DatePrinter printer = getInstance("");
+        assertEquals("", printer.format(new Date()));
+    }
+
+    @Test
+    void testParsePatternDayOfWeekInMonth() {
+        // 'F' formats the day-of-week occurrence in the month
+        final DatePrinter printer = getInstance("F");
+        final String result = printer.format(new Date());
+        assertTrue(result.matches("[1-5]"), "Expected day-of-week-in-month digit, got: " + result);
+    }
+
+    @Test
+    void testParsePatternWeekInMonth() {
+        // 'W' formats the week number within the month
+        final DatePrinter printer = getInstance("W");
+        final String result = printer.format(new Date());
+        assertTrue(result.matches("[1-6]"), "Expected week-in-month digit, got: " + result);
+    }
+
+    @Test
+    void testParsePatternIllegalCharacter() {
+        // unrecognised pattern characters should throw
+        assertIllegalArgumentException(() -> getInstance("q"));
+    }
 }
