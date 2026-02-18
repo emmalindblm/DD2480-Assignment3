@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 package org.apache.commons.lang3.math;
-
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -580,7 +579,7 @@ public class NumberUtils {
      * @return {@code true} if the string is a correctly formatted number.
      * @since 3.5
      */
-    public static boolean isCreatable(final String str) {
+        public static boolean isCreatable(final String str) {
         //start-value +1
         if (StringUtils.isEmpty(str)) { //+1
             return false;
@@ -1816,4 +1815,7 @@ public class NumberUtils {
     public NumberUtils() {
         // empty
     }
+    
+
+
 }

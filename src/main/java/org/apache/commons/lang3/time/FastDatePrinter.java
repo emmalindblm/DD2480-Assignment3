@@ -1336,6 +1336,50 @@ public class FastDatePrinter implements DatePrinter, Serializable {
      * @throws IllegalArgumentException if pattern is invalid.
      */
     protected List<Rule> parsePattern() {
+        // DIY branch coverage instrumentation (Task 3.5.1)
+        // Branch IDs for parsePattern (40 total):
+        //   B00 – for-loop not entered / loop exhausted (i >= length)
+        //   B01 – tokenLen == 0 → break
+        //   B02 – switch 'G'
+        //   B03 – switch 'y'/'Y', tokenLen == 2  (TwoDigitYearField)
+        //   B04 – switch 'y'/'Y', tokenLen != 2  (selectNumberRule)
+        //   B05 – switch 'y'/'Y', c == 'Y'       (WeekYear wrap)
+        //   B06 – switch 'y'/'Y', c != 'Y'
+        //   B07 – switch 'M', tokenLen >= 4
+        //   B08 – switch 'M', tokenLen == 3
+        //   B09 – switch 'M', tokenLen == 2
+        //   B10 – switch 'M', else (tokenLen == 1)
+        //   B11 – switch 'L', tokenLen >= 4
+        //   B12 – switch 'L', tokenLen == 3
+        //   B13 – switch 'L', tokenLen == 2
+        //   B14 – switch 'L', else (tokenLen == 1)
+        //   B15 – switch 'd'
+        //   B16 – switch 'h'
+        //   B17 – switch 'H'
+        //   B18 – switch 'm'
+        //   B19 – switch 's'
+        //   B20 – switch 'S'
+        //   B21 – switch 'E', tokenLen < 4  (shortWeekdays)
+        //   B22 – switch 'E', tokenLen >= 4 (weekdays)
+        //   B23 – switch 'u'
+        //   B24 – switch 'D'
+        //   B25 – switch 'F'
+        //   B26 – switch 'w'
+        //   B27 – switch 'W'
+        //   B28 – switch 'a'
+        //   B29 – switch 'k'
+        //   B30 – switch 'K'
+        //   B31 – switch 'X'
+        //   B32 – switch 'z', tokenLen >= 4 (LONG)
+        //   B33 – switch 'z', tokenLen < 4  (SHORT)
+        //   B34 – switch 'Z', tokenLen == 1
+        //   B35 – switch 'Z', tokenLen == 2
+        //   B36 – switch 'Z', else
+        //   B37 – switch '\'', sub.length() == 1 (CharacterLiteral)
+        //   B38 – switch '\'', sub.length() != 1 (StringLiteral)
+        //   B39 – switch default (IllegalArgumentException)
+        final String FN = "parsePattern";
+
         final DateFormatSymbols symbols = new DateFormatSymbols(locale);
         final List<Rule> rules = new ArrayList<>();
 
@@ -1349,131 +1393,181 @@ public class FastDatePrinter implements DatePrinter, Serializable {
         final int length = pattern.length();
         final int[] indexRef = new int[1];
 
-        for (int i = 0; i < length; i++) {
-            indexRef[0] = i;
-            final String token = parseToken(pattern, indexRef);
-            i = indexRef[0];
+        try {
+            for (int i = 0; i < length; i++) {
+                indexRef[0] = i;
+                final String token = parseToken(pattern, indexRef);
+                i = indexRef[0];
 
-            final int tokenLen = token.length();
-            if (tokenLen == 0) {
-                break;
+                final int tokenLen = token.length();
+                if (tokenLen == 0) {
+                    BranchCoverage.hit(FN, 1); // B01 – tokenLen == 0 → break
+                    break;
+                }
+
+                Rule rule;
+                final char c = token.charAt(0);
+
+                switch (c) {
+                case 'G': // era designator (text)
+                    BranchCoverage.hit(FN, 2); // B02
+                    rule = new TextField(Calendar.ERA, ERAs);
+                    break;
+                case 'y': // year (number)
+                case 'Y': // week year
+                    if (tokenLen == 2) {
+                        BranchCoverage.hit(FN, 3); // B03 – tokenLen == 2
+                        rule = TwoDigitYearField.INSTANCE;
+                    } else {
+                        BranchCoverage.hit(FN, 4); // B04 – tokenLen != 2
+                        rule = selectNumberRule(Calendar.YEAR, Math.max(tokenLen, 4));
+                    }
+                    if (c == 'Y') {
+                        BranchCoverage.hit(FN, 5); // B05 – c == 'Y'
+                        rule = new WeekYear((NumberRule) rule);
+                    } else {
+                        BranchCoverage.hit(FN, 6); // B06 – c != 'Y' (plain 'y')
+                    }
+                    break;
+                case 'M': // month in year (text and number)
+                    if (tokenLen >= 4) {
+                        BranchCoverage.hit(FN, 7); // B07
+                        rule = new TextField(Calendar.MONTH, months);
+                    } else if (tokenLen == 3) {
+                        BranchCoverage.hit(FN, 8); // B08
+                        rule = new TextField(Calendar.MONTH, shortMonths);
+                    } else if (tokenLen == 2) {
+                        BranchCoverage.hit(FN, 9); // B09
+                        rule = TwoDigitMonthField.INSTANCE;
+                    } else {
+                        BranchCoverage.hit(FN, 10); // B10
+                        rule = UnpaddedMonthField.INSTANCE;
+                    }
+                    break;
+                case 'L': // month in year (text and number)
+                    if (tokenLen >= 4) {
+                        BranchCoverage.hit(FN, 11); // B11
+                        rule = new TextField(Calendar.MONTH, CalendarUtils.getInstance(locale).getStandaloneLongMonthNames());
+                    } else if (tokenLen == 3) {
+                        BranchCoverage.hit(FN, 12); // B12
+                        rule = new TextField(Calendar.MONTH, CalendarUtils.getInstance(locale).getStandaloneShortMonthNames());
+                    } else if (tokenLen == 2) {
+                        BranchCoverage.hit(FN, 13); // B13
+                        rule = TwoDigitMonthField.INSTANCE;
+                    } else {
+                        BranchCoverage.hit(FN, 14); // B14
+                        rule = UnpaddedMonthField.INSTANCE;
+                    }
+                    break;
+                case 'd': // day in month (number)
+                    BranchCoverage.hit(FN, 15); // B15
+                    rule = selectNumberRule(Calendar.DAY_OF_MONTH, tokenLen);
+                    break;
+                case 'h': // hour in am/pm (number, 1..12)
+                    BranchCoverage.hit(FN, 16); // B16
+                    rule = new TwelveHourField(selectNumberRule(Calendar.HOUR, tokenLen));
+                    break;
+                case 'H': // hour in day (number, 0..23)
+                    BranchCoverage.hit(FN, 17); // B17
+                    rule = selectNumberRule(Calendar.HOUR_OF_DAY, tokenLen);
+                    break;
+                case 'm': // minute in hour (number)
+                    BranchCoverage.hit(FN, 18); // B18
+                    rule = selectNumberRule(Calendar.MINUTE, tokenLen);
+                    break;
+                case 's': // second in minute (number)
+                    BranchCoverage.hit(FN, 19); // B19
+                    rule = selectNumberRule(Calendar.SECOND, tokenLen);
+                    break;
+                case 'S': // millisecond (number)
+                    BranchCoverage.hit(FN, 20); // B20
+                    rule = selectNumberRule(Calendar.MILLISECOND, tokenLen);
+                    break;
+                case 'E': // day in week (text)
+                    if (tokenLen < 4) {
+                        BranchCoverage.hit(FN, 21); // B21 – shortWeekdays
+                    } else {
+                        BranchCoverage.hit(FN, 22); // B22 – weekdays
+                    }
+                    rule = new TextField(Calendar.DAY_OF_WEEK, tokenLen < 4 ? shortWeekdays : weekdays);
+                    break;
+                case 'u': // day in week (number)
+                    BranchCoverage.hit(FN, 23); // B23
+                    rule = new DayInWeekField(selectNumberRule(Calendar.DAY_OF_WEEK, tokenLen));
+                    break;
+                case 'D': // day in year (number)
+                    BranchCoverage.hit(FN, 24); // B24
+                    rule = selectNumberRule(Calendar.DAY_OF_YEAR, tokenLen);
+                    break;
+                case 'F': // day of week in month (number)
+                    BranchCoverage.hit(FN, 25); // B25
+                    rule = selectNumberRule(Calendar.DAY_OF_WEEK_IN_MONTH, tokenLen);
+                    break;
+                case 'w': // week in year (number)
+                    BranchCoverage.hit(FN, 26); // B26
+                    rule = selectNumberRule(Calendar.WEEK_OF_YEAR, tokenLen);
+                    break;
+                case 'W': // week in month (number)
+                    BranchCoverage.hit(FN, 27); // B27
+                    rule = selectNumberRule(Calendar.WEEK_OF_MONTH, tokenLen);
+                    break;
+                case 'a': // am/pm marker (text)
+                    BranchCoverage.hit(FN, 28); // B28
+                    rule = new TextField(Calendar.AM_PM, AmPmStrings);
+                    break;
+                case 'k': // hour in day (1..24)
+                    BranchCoverage.hit(FN, 29); // B29
+                    rule = new TwentyFourHourField(selectNumberRule(Calendar.HOUR_OF_DAY, tokenLen));
+                    break;
+                case 'K': // hour in am/pm (0..11)
+                    BranchCoverage.hit(FN, 30); // B30
+                    rule = selectNumberRule(Calendar.HOUR, tokenLen);
+                    break;
+                case 'X': // ISO 8601
+                    BranchCoverage.hit(FN, 31); // B31
+                    rule = Iso8601_Rule.getRule(tokenLen);
+                    break;
+                case 'z': // time zone (text)
+                    if (tokenLen >= 4) {
+                        BranchCoverage.hit(FN, 32); // B32 – LONG
+                    } else {
+                        BranchCoverage.hit(FN, 33); // B33 – SHORT
+                    }
+                    rule = new TimeZoneNameRule(timeZone, locale, tokenLen >= 4 ? TimeZone.LONG : TimeZone.SHORT);
+                    break;
+                case 'Z': // time zone (value)
+                    if (tokenLen == 1) {
+                        BranchCoverage.hit(FN, 34); // B34
+                        rule = TimeZoneNumberRule.INSTANCE_NO_COLON;
+                    } else if (tokenLen == 2) {
+                        BranchCoverage.hit(FN, 35); // B35
+                        rule = Iso8601_Rule.ISO8601_HOURS_COLON_MINUTES;
+                    } else {
+                        BranchCoverage.hit(FN, 36); // B36
+                        rule = TimeZoneNumberRule.INSTANCE_COLON;
+                    }
+                    break;
+                case '\'': // literal text
+                    final String sub = token.substring(1);
+                    if (sub.length() == 1) {
+                        BranchCoverage.hit(FN, 37); // B37
+                        rule = new CharacterLiteral(sub.charAt(0));
+                    } else {
+                        BranchCoverage.hit(FN, 38); // B38
+                        rule = new StringLiteral(sub);
+                    }
+                    break;
+                default:
+                    BranchCoverage.hit(FN, 39); // B39 – illegal pattern character
+                    throw new IllegalArgumentException("Illegal pattern component: " + token);
+                }
+
+                rules.add(rule);
             }
-
-            Rule rule;
-            final char c = token.charAt(0);
-
-            switch (c) {
-            case 'G': // era designator (text)
-                rule = new TextField(Calendar.ERA, ERAs);
-                break;
-            case 'y': // year (number)
-            case 'Y': // week year
-                if (tokenLen == 2) {
-                    rule = TwoDigitYearField.INSTANCE;
-                } else {
-                    rule = selectNumberRule(Calendar.YEAR, Math.max(tokenLen, 4));
-                }
-                if (c == 'Y') {
-                    rule = new WeekYear((NumberRule) rule);
-                }
-                break;
-            case 'M': // month in year (text and number)
-                if (tokenLen >= 4) {
-                    rule = new TextField(Calendar.MONTH, months);
-                } else if (tokenLen == 3) {
-                    rule = new TextField(Calendar.MONTH, shortMonths);
-                } else if (tokenLen == 2) {
-                    rule = TwoDigitMonthField.INSTANCE;
-                } else {
-                    rule = UnpaddedMonthField.INSTANCE;
-                }
-                break;
-            case 'L': // month in year (text and number)
-                if (tokenLen >= 4) {
-                    rule = new TextField(Calendar.MONTH, CalendarUtils.getInstance(locale).getStandaloneLongMonthNames());
-                } else if (tokenLen == 3) {
-                    rule = new TextField(Calendar.MONTH, CalendarUtils.getInstance(locale).getStandaloneShortMonthNames());
-                } else if (tokenLen == 2) {
-                    rule = TwoDigitMonthField.INSTANCE;
-                } else {
-                    rule = UnpaddedMonthField.INSTANCE;
-                }
-                break;
-            case 'd': // day in month (number)
-                rule = selectNumberRule(Calendar.DAY_OF_MONTH, tokenLen);
-                break;
-            case 'h': // hour in am/pm (number, 1..12)
-                rule = new TwelveHourField(selectNumberRule(Calendar.HOUR, tokenLen));
-                break;
-            case 'H': // hour in day (number, 0..23)
-                rule = selectNumberRule(Calendar.HOUR_OF_DAY, tokenLen);
-                break;
-            case 'm': // minute in hour (number)
-                rule = selectNumberRule(Calendar.MINUTE, tokenLen);
-                break;
-            case 's': // second in minute (number)
-                rule = selectNumberRule(Calendar.SECOND, tokenLen);
-                break;
-            case 'S': // millisecond (number)
-                rule = selectNumberRule(Calendar.MILLISECOND, tokenLen);
-                break;
-            case 'E': // day in week (text)
-                rule = new TextField(Calendar.DAY_OF_WEEK, tokenLen < 4 ? shortWeekdays : weekdays);
-                break;
-            case 'u': // day in week (number)
-                rule = new DayInWeekField(selectNumberRule(Calendar.DAY_OF_WEEK, tokenLen));
-                break;
-            case 'D': // day in year (number)
-                rule = selectNumberRule(Calendar.DAY_OF_YEAR, tokenLen);
-                break;
-            case 'F': // day of week in month (number)
-                rule = selectNumberRule(Calendar.DAY_OF_WEEK_IN_MONTH, tokenLen);
-                break;
-            case 'w': // week in year (number)
-                rule = selectNumberRule(Calendar.WEEK_OF_YEAR, tokenLen);
-                break;
-            case 'W': // week in month (number)
-                rule = selectNumberRule(Calendar.WEEK_OF_MONTH, tokenLen);
-                break;
-            case 'a': // am/pm marker (text)
-                rule = new TextField(Calendar.AM_PM, AmPmStrings);
-                break;
-            case 'k': // hour in day (1..24)
-                rule = new TwentyFourHourField(selectNumberRule(Calendar.HOUR_OF_DAY, tokenLen));
-                break;
-            case 'K': // hour in am/pm (0..11)
-                rule = selectNumberRule(Calendar.HOUR, tokenLen);
-                break;
-            case 'X': // ISO 8601
-                rule = Iso8601_Rule.getRule(tokenLen);
-                break;
-            case 'z': // time zone (text)
-                rule = new TimeZoneNameRule(timeZone, locale, tokenLen >= 4 ? TimeZone.LONG : TimeZone.SHORT);
-                break;
-            case 'Z': // time zone (value)
-                if (tokenLen == 1) {
-                    rule = TimeZoneNumberRule.INSTANCE_NO_COLON;
-                } else if (tokenLen == 2) {
-                    rule = Iso8601_Rule.ISO8601_HOURS_COLON_MINUTES;
-                } else {
-                    rule = TimeZoneNumberRule.INSTANCE_COLON;
-                }
-                break;
-            case '\'': // literal text
-                final String sub = token.substring(1);
-                if (sub.length() == 1) {
-                    rule = new CharacterLiteral(sub.charAt(0));
-                } else {
-                    rule = new StringLiteral(sub);
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("Illegal pattern component: " + token);
-            }
-
-            rules.add(rule);
+            BranchCoverage.hit(FN, 0); // B00 – loop exhausted / never entered
+        } finally {
+            BranchCoverage.report(FN);
         }
-
         return rules;
     }
 
