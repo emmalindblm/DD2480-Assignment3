@@ -22,6 +22,8 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.time.BranchCoverage;
+
 /**
  * Generates random {@link String}s.
  * <p>
@@ -256,56 +258,82 @@ public class RandomStringUtils {
             final char[] chars, final Random random) {
         // Branch 1: count == 0
         if (count == 0) {
+            BranchCoverage.hit("RandomStringUtils.random", 1);
             return StringUtils.EMPTY;
         } // Branch 2: count != 0 (implicit)
+        else{
+            BranchCoverage.hit("RandomStringUtils.random", 2);
+        }
 
         // Branch 3: count < 0
         if (count < 0) {
+            BranchCoverage.hit("RandomStringUtils.random", 3);
             throw new IllegalArgumentException("Requested random string length " + count + " is less than 0.");
         } // Branch 4: count > 0 (implicit)
+        else{
+            BranchCoverage.hit("RandomStringUtils.random", 4);
+        }
 
         // Branch 5: chars != null && chars.length == 0
         if (chars != null && chars.length == 0) {
+            BranchCoverage.hit("RandomStringUtils.random", 5);
             throw new IllegalArgumentException("The chars array must not be empty");
         } // Branch 6: !(chars != null && chars.length == 0) (implicit)
+        else{
+            BranchCoverage.hit("RandomStringUtils.random", 6);
+        }
 
         // Branch 7: start == 0 && end == 0
         if (start == 0 && end == 0) {
-
+            BranchCoverage.hit("RandomStringUtils.random", 7);
+            
             // Branch 8: chars != null
             if (chars != null) {
+                BranchCoverage.hit("RandomStringUtils.random", 8);
                 end = chars.length;
 
             // Branch 9: !letters && !digits
             } else if (!letters && !digits) {
+                BranchCoverage.hit("RandomStringUtils.random", 9);
                 end = Character.MAX_CODE_POINT;
 
             // Branch 10: else
             } else {
+                BranchCoverage.hit("RandomStringUtils.random", 10);
                 end = 'z' + 1;
                 start = ' ';
             }
         
         // Branch 11: end <= start
         } else if (end <= start) {
+            BranchCoverage.hit("RandomStringUtils.random", 11);
             throw new IllegalArgumentException("Parameter end (" + end + ") must be greater than start (" + start + ")");
         
         // Branch 12: start < 0 || end < 0
         } else if (start < 0 || end < 0) {
+            BranchCoverage.hit("RandomStringUtils.random", 12);
             throw new IllegalArgumentException("Character positions MUST be >= 0");
         }
         // Branch 13: implicit else for branch 7,11,12
+        else{
+            BranchCoverage.hit("RandomStringUtils.random", 13);
+        }
 
         // Branch 14: end > Character.MAX_CODE_POINT
         if (end > Character.MAX_CODE_POINT) {
+            BranchCoverage.hit("RandomStringUtils.random", 14);
             // Technically, it should be `Character.MAX_CODE_POINT+1` as `end` is excluded
             // But the character `Character.MAX_CODE_POINT` is private use, so it would anyway be excluded
             end = Character.MAX_CODE_POINT;
         } // Branch 15: end <= Character.MAX_CODE_POINT (implicit)
+        else{
+            BranchCoverage.hit("RandomStringUtils.random", 15);
+        }
 
         // Optimizations and tests when chars == null and using ASCII characters (end <= 0x7f)
         // Branch 16: chars == null && end <= 0x7f 
         if (chars == null && end <= 0x7f) {
+            BranchCoverage.hit("RandomStringUtils.random", 16);
             // Optimize generation of full alphanumerical characters
             // Normally, we would need to pick a 7-bit integer, since gap = 'z' - '0' + 1 = 75 > 64
             // In turn, this would make us reject the sampling with probability 1 - 62 / 2^7 > 1 / 2
@@ -314,14 +342,22 @@ public class RandomStringUtils {
             
             // Branch 17: letters && digits && start <= ASCII_0 && end >= ASCII_z + 1
             if (letters && digits && start <= ASCII_0 && end >= ASCII_z + 1) {
+                BranchCoverage.hit("RandomStringUtils.random", 17);
                 return random(count, 0, 0, false, false, ALPHANUMERICAL_CHARS, random);
             } // Branch 18: !(letters && digits && start <= ASCII_0 && end >= ASCII_z + 1) (implicit)
+            else{
+                BranchCoverage.hit("RandomStringUtils.random", 18);
+            }
 
             // Branch 19: digits && end <= ASCII_0 || letters && end <= ASCII_A
             if (digits && end <= ASCII_0 || letters && end <= ASCII_A) {
+                BranchCoverage.hit("RandomStringUtils.random", 19);
                 throw new IllegalArgumentException("Parameter end (" + end + ") must be greater than (" + ASCII_0 + ") for generating digits "
                         + "or greater than (" + ASCII_A + ") for generating letters.");
             } // Branch 20: !(digits && end <= ASCII_0 || letters && end <= ASCII_A) (implicit)
+            else{
+                BranchCoverage.hit("RandomStringUtils.random", 20);
+            }
 
             // Optimize start and end when filtering by letters and/or numbers:
             // The range provided may be too large since we filter anyway afterward.
@@ -334,61 +370,111 @@ public class RandomStringUtils {
             
             // Branch 21: letters && digits
             if (letters && digits) {
+                BranchCoverage.hit("RandomStringUtils.random", 21);
                 start = Math.max(ASCII_0, start);
                 end = Math.min(ASCII_z + 1, end);
             
             // Branch 22: digits
             } else if (digits) {
+                BranchCoverage.hit("RandomStringUtils.random", 22);
                 // just numbers, no letters
                 start = Math.max(ASCII_0, start);
                 end = Math.min(ASCII_9 + 1, end);
 
             // Branch 23: letters
             } else if (letters) {
+                BranchCoverage.hit("RandomStringUtils.random", 23);
                 // just letters, no numbers
                 start = Math.max(ASCII_A, start);
                 end = Math.min(ASCII_z + 1, end);
             }
             // Branch 24: implicit else for branch 21,22,23
+            else{
+                BranchCoverage.hit("RandomStringUtils.random", 24);
+            }
         } // Branch 25: !(chars == null && end <= 0x7f) (implicit)
+        else{
+            BranchCoverage.hit("RandomStringUtils.random", 25);
+        }
 
         // Branch 26: letters && !digits
         if (letters && !digits) {
+            BranchCoverage.hit("RandomStringUtils.random", 26);
 
             // Branch 27: for loop entered i < end
             // Branch 28: for looped skipped i >= end (implicit)
+            boolean loopEntered = false;
             for (int i = start; i < end; i++) {
+                if(loopEntered == false){
+                    BranchCoverage.hit("RandomStringUtils.random", 27);
+                    loopEntered = true;
+                }
 
                 // Branch 29: Character.isLetter(i)
                 if (Character.isLetter(i)) {
+                    BranchCoverage.hit("RandomStringUtils.random", 29);
                     break;
                 } // Branch 30: !(Character.isLetter(i)) (implicit)
+                else{
+                    BranchCoverage.hit("RandomStringUtils.random", 30);
+                }
 
                 // Branch 31: i == end - 1
                 if (i == end - 1) {
+                    BranchCoverage.hit("RandomStringUtils.random", 31);
                     throw new IllegalArgumentException(String.format("No letters exist between start %,d and end %,d.", start, end));
                 } // Branch 32: i != end - 1 (implicit)
+                else {
+                    BranchCoverage.hit("RandomStringUtils.random", 32);
+                }
             } 
+            if(loopEntered == false){
+                BranchCoverage.hit("RandomStringUtils.random", 28);
+            }
         } // Branch 33: !(letters && !digits)
+        else{
+            BranchCoverage.hit("RandomStringUtils.random", 33);
+        }
 
         // Branch 34: !letters && digits
         if (!letters && digits) {
+            BranchCoverage.hit("RandomStringUtils.random", 34);
 
             // Branch 35: for loop entered i < end
             // Branch 36: for loop skipped i >= end
+            boolean loopEntered = false;
             for (int i = start; i < end; i++) {
+                if(loopEntered == false){
+                    BranchCoverage.hit("RandomStringUtils.random", 35);
+                    loopEntered = true;
+                }
 
                 // Branch 37: Character.isDigit(i)
                 if (Character.isDigit(i)) {
+                    BranchCoverage.hit("RandomStringUtils.random", 37);
                     break;
                 } // Branch 38: !(Character.isDigit(i)) (implicit)
+                else{
+                    BranchCoverage.hit("RandomStringUtils.random", 38);
+                }
 
                 // Branch 39: i == end - 1
                 if (i == end - 1) {
+                    BranchCoverage.hit("RandomStringUtils.random", 39);
                     throw new IllegalArgumentException(String.format("No digits exist between start %,d and end %,d.", start, end));
                 } // Branch 40: i != end - 1 (implicit)
+                else {
+                    BranchCoverage.hit("RandomStringUtils.random", 40);
+                }
+            }
+            if(loopEntered == false){
+                BranchCoverage.hit("RandomStringUtils.random", 36);
             }
         } // Branch 41: !(!letters && digits) (implicit)
+        else{
+            BranchCoverage.hit("RandomStringUtils.random", 41);
+        }
+
         final StringBuilder builder = new StringBuilder(count);
         final int gap = end - start;
         final int gapBits = Integer.SIZE - Integer.numberOfLeadingZeros(gap);
@@ -410,20 +496,31 @@ public class RandomStringUtils {
         
         // Branch 42: while loop entered count != 0
         // Branch 43: while loop skipped count == 0
+        boolean whileEntered = false;
         while (count-- != 0) {
+            if(whileEntered == false){
+                BranchCoverage.hit("RandomStringUtils.random", 42);
+                whileEntered = true;
+            }
+
             // Generate a random value between start (included) and end (excluded)
             final int randomValue = arb.nextBits(gapBits) + start;
             
             // Rejection sampling if value too large
             // Branch 44: randomValue >= end
             if (randomValue >= end) {
+                BranchCoverage.hit("RandomStringUtils.random", 44);
                 count++;
                 continue;
             } // Branch 45: randomValue < end (implicit)
+            else{
+                BranchCoverage.hit("RandomStringUtils.random", 45);
+            }
             final int codePoint;
 
             // Branch 46: chars == null
             if (chars == null) {
+                BranchCoverage.hit("RandomStringUtils.random", 46);
                 codePoint = randomValue;
                 switch (Character.getType(codePoint)) {
                 
@@ -431,35 +528,54 @@ public class RandomStringUtils {
                 case Character.UNASSIGNED:
                 case Character.PRIVATE_USE:
                 case Character.SURROGATE:
+                    BranchCoverage.hit("RandomStringUtils.random", 47);
                     count++;
                     continue;
-                } // Branch 48: none of the case (implicit)
+                // Branch 48: none of the case (implicit)
+                default:
+                    BranchCoverage.hit("RandomStringUtils.random", 48);
+                    break;
+                } 
             
             // Branch 49: else
             } else {
+                BranchCoverage.hit("RandomStringUtils.random", 49);
                 codePoint = chars[randomValue];
             }
             final int numberOfChars = Character.charCount(codePoint);
 
             // Branch 50: count == 0 && numberOfChars > 1
             if (count == 0 && numberOfChars > 1) {
+                BranchCoverage.hit("RandomStringUtils.random", 50);
                 count++;
                 continue;
             } // Branch 51: !(count == 0 && numberOfChars > 1) (implicit)
+            else {
+                BranchCoverage.hit("RandomStringUtils.random", 51);
+            }
 
             // Branch 52: letters && Character.isLetter(codePoint) || digits && Character.isDigit(codePoint) || !letters && !digits
             if (letters && Character.isLetter(codePoint) || digits && Character.isDigit(codePoint) || !letters && !digits) {
+                BranchCoverage.hit("RandomStringUtils.random", 52);
                 builder.appendCodePoint(codePoint);
 
                 // Branch 53: numberOfChars == 2
                 if (numberOfChars == 2) {
+                    BranchCoverage.hit("RandomStringUtils.random", 53);
                     count--;
                 } // Branch 54: numberOfChars != 2 (implicit)
+                else {
+                    BranchCoverage.hit("RandomStringUtils.random", 54);
+                }
             
             // Branch 55: else
             } else {
+                BranchCoverage.hit("RandomStringUtils.random", 55);
                 count++;
             }
+        }
+        if(whileEntered == false){
+            BranchCoverage.hit("RandomStringUtils.random", 43);
         }
         return builder.toString();
     }
