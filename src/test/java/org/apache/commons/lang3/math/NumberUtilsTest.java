@@ -2025,4 +2025,45 @@ class NumberUtilsTest extends AbstractLangTest {
         assertEquals(5, NumberUtils.toShort("", (short) 5));
         assertEquals(5, NumberUtils.toShort(null, (short) 5));
     }
+
+
+  @Test
+    void testRejectEmptyHexPrefix()
+    {
+        // Requirement: Hexadecimal strings must contain digits after the '0x' prefix.
+        //Covers Branch 6
+       assertFalse(NumberUtils.isCreatable("0x"), "Should return false for an empty hex prefix '0x'"); 
+    }
+    @Test
+    void testRejectMultipleExponents()
+    {
+        // Requirement: A numeric string cannot contain more than one exponent marker ('e' or 'E').
+        //Covers Branch 7
+        assertFalse(NumberUtils.isCreatable("1e1e1"), "Should return false for multiple exponent markers");
+    }
+    @Test
+    void testIsCreatableShouldRejectDecimalInExponent() {
+        // Requirement 30: Reject decimal points at the end if already decimal/exponent
+        // This targets the specific 'if (hasDecPoint || hasExp)' check at the end
+        assertFalse(NumberUtils.isCreatable("0.0."), "Branch 30: Double decimal at end should be false");
+        assertFalse(NumberUtils.isCreatable("1e1."), "Branch 30: Decimal after exponent at end should be false");
+    }
+
+    @Test
+    void testIsCreatableShouldAcceptValidIntegerAtFinalPath() {
+        // Requirement 36: Reach the absolute final return statement of the method
+        // We need a string that bypasses the "if (i < chars.length)" block at the very end
+        assertTrue(NumberUtils.isCreatable("2."), "Branch 36: '2.' should reach the final return statement");
+    }
+    @org.junit.jupiter.api.AfterAll
+    public static void reportDIYCoverage() {
+        System.out.println("--------------------------------------------------");
+        System.out.println("FINAL DIY BRANCH COVERAGE REPORT FOR ISCREATABLE");
+        org.apache.commons.lang3.time.BranchCoverage.report("isCreatable");
+        System.out.println("--------------------------------------------------");
+    }
 }
+
+  
+
+
