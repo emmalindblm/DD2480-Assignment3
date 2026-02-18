@@ -16,6 +16,8 @@
  */
 package org.apache.commons.lang3;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +38,15 @@ import org.apache.commons.lang3.math.NumberUtils;
  */
 public class BooleanUtils {
 
+    // --- manual counting ---
+    public static Set<Integer> visitedBranches = new HashSet<>();
+
+    public static void printCoverage() {
+        System.out.println("MANUAL COVERAGE RESULTS:");
+        System.out.println("Covered branches: " + visitedBranches);
+        System.out.println("Total covered: " + visitedBranches.size());
+    }
+    // ---------------------------------------
     private static final List<Boolean> BOOLEAN_LIST = Collections.unmodifiableList(Arrays.asList(Boolean.FALSE, Boolean.TRUE));
 
     /**
@@ -736,96 +747,119 @@ public class BooleanUtils {
      * @return the Boolean value of the string, {@code null} if no match or {@code null} input
      */
     public static Boolean toBooleanObject(final String str) {
-        // Previously used equalsIgnoreCase, which was fast for interned 'true'.
-        // Non interned 'true' matched 15 times slower.
-        //
-        // Optimization provides same performance as before for interned 'true'.
-        // Similar performance for null, 'false', and other strings not length 2/3/4.
-        // 'true'/'TRUE' match 4 times slower, 'tRUE'/'True' 7 times slower.
-        if (str == TRUE) {
-            return Boolean.TRUE;
-        }
-        if (str == null) {
+
+            // Previously used equalsIgnoreCase, which was fast for interned 'true'.
+            // Non interned 'true' matched 15 times slower.
+            // This optimised version reduces the "constant factor" complexity (execution speed)
+            // Optimization provides same performance as before for interned 'true'.
+            // Similar performance for null, 'false', and other strings not length 2/3/4.
+            // 'true'/'TRUE' match 4 times slower, 'tRUE'/'True' 7 times slower.
+            visitedBranches.add(1); // Entry point
+
+            if (str == TRUE) {
+                visitedBranches.add(2);
+                return Boolean.TRUE;
+            }
+            if (str == null) {
+                visitedBranches.add(3);
+                return null;
+            }
+
+            visitedBranches.add(4); // Switch entry
+
+            switch (str.length()) {
+                case 1: {
+                    visitedBranches.add(5);
+                    final char ch0 = str.charAt(0);
+                    if (ch0 == 'y' || ch0 == 'Y' ||
+                            ch0 == 't' || ch0 == 'T' ||
+                            ch0 == '1') {
+                        visitedBranches.add(6);
+                        return Boolean.TRUE;
+                    }
+                    if (ch0 == 'n' || ch0 == 'N' ||
+                            ch0 == 'f' || ch0 == 'F' ||
+                            ch0 == '0') {
+                        visitedBranches.add(7);
+                        return Boolean.FALSE;
+                    }
+                    break;
+                }
+                case 2: {
+                    visitedBranches.add(8);
+                    final char ch0 = str.charAt(0);
+                    final char ch1 = str.charAt(1);
+                    if ((ch0 == 'o' || ch0 == 'O') &&
+                            (ch1 == 'n' || ch1 == 'N')) {
+                        visitedBranches.add(9);
+                        return Boolean.TRUE;
+                    }
+                    if ((ch0 == 'n' || ch0 == 'N') &&
+                            (ch1 == 'o' || ch1 == 'O')) {
+                        visitedBranches.add(10);
+                        return Boolean.FALSE;
+                    }
+                    break;
+                }
+                case 3: {
+                    visitedBranches.add(11);
+                    final char ch0 = str.charAt(0);
+                    final char ch1 = str.charAt(1);
+                    final char ch2 = str.charAt(2);
+                    if ((ch0 == 'y' || ch0 == 'Y') &&
+                            (ch1 == 'e' || ch1 == 'E') &&
+                            (ch2 == 's' || ch2 == 'S')) {
+                        visitedBranches.add(12);
+                        return Boolean.TRUE;
+                    }
+                    if ((ch0 == 'o' || ch0 == 'O') &&
+                            (ch1 == 'f' || ch1 == 'F') &&
+                            (ch2 == 'f' || ch2 == 'F')) {
+                        visitedBranches.add(13);
+                        return Boolean.FALSE;
+                    }
+                    break;
+                }
+                case 4: {
+                    visitedBranches.add(14);
+                    final char ch0 = str.charAt(0);
+                    final char ch1 = str.charAt(1);
+                    final char ch2 = str.charAt(2);
+                    final char ch3 = str.charAt(3);
+                    if ((ch0 == 't' || ch0 == 'T') &&
+                            (ch1 == 'r' || ch1 == 'R') &&
+                            (ch2 == 'u' || ch2 == 'U') &&
+                            (ch3 == 'e' || ch3 == 'E')) {
+                        visitedBranches.add(15);
+                        return Boolean.TRUE;
+                    }
+                    break;
+                }
+                case 5: {
+                    visitedBranches.add(16);
+                    final char ch0 = str.charAt(0);
+                    final char ch1 = str.charAt(1);
+                    final char ch2 = str.charAt(2);
+                    final char ch3 = str.charAt(3);
+                    final char ch4 = str.charAt(4);
+                    if ((ch0 == 'f' || ch0 == 'F') &&
+                            (ch1 == 'a' || ch1 == 'A') &&
+                            (ch2 == 'l' || ch2 == 'L') &&
+                            (ch3 == 's' || ch3 == 'S') &&
+                            (ch4 == 'e' || ch4 == 'E')) {
+                        visitedBranches.add(17);
+                        return Boolean.FALSE;
+                    }
+                    break;
+                }
+                default:
+                    visitedBranches.add(18);
+                    break;
+            }
+
+            visitedBranches.add(19); // Fall through
             return null;
         }
-        switch (str.length()) {
-            case 1: {
-                final char ch0 = str.charAt(0);
-                if (ch0 == 'y' || ch0 == 'Y' ||
-                    ch0 == 't' || ch0 == 'T' ||
-                    ch0 == '1') {
-                    return Boolean.TRUE;
-                }
-                if (ch0 == 'n' || ch0 == 'N' ||
-                    ch0 == 'f' || ch0 == 'F' ||
-                    ch0 == '0') {
-                    return Boolean.FALSE;
-                }
-                break;
-            }
-            case 2: {
-                final char ch0 = str.charAt(0);
-                final char ch1 = str.charAt(1);
-                if ((ch0 == 'o' || ch0 == 'O') &&
-                    (ch1 == 'n' || ch1 == 'N')) {
-                    return Boolean.TRUE;
-                }
-                if ((ch0 == 'n' || ch0 == 'N') &&
-                    (ch1 == 'o' || ch1 == 'O')) {
-                    return Boolean.FALSE;
-                }
-                break;
-            }
-            case 3: {
-                final char ch0 = str.charAt(0);
-                final char ch1 = str.charAt(1);
-                final char ch2 = str.charAt(2);
-                if ((ch0 == 'y' || ch0 == 'Y') &&
-                    (ch1 == 'e' || ch1 == 'E') &&
-                    (ch2 == 's' || ch2 == 'S')) {
-                    return Boolean.TRUE;
-                }
-                if ((ch0 == 'o' || ch0 == 'O') &&
-                    (ch1 == 'f' || ch1 == 'F') &&
-                    (ch2 == 'f' || ch2 == 'F')) {
-                    return Boolean.FALSE;
-                }
-                break;
-            }
-            case 4: {
-                final char ch0 = str.charAt(0);
-                final char ch1 = str.charAt(1);
-                final char ch2 = str.charAt(2);
-                final char ch3 = str.charAt(3);
-                if ((ch0 == 't' || ch0 == 'T') &&
-                    (ch1 == 'r' || ch1 == 'R') &&
-                    (ch2 == 'u' || ch2 == 'U') &&
-                    (ch3 == 'e' || ch3 == 'E')) {
-                    return Boolean.TRUE;
-                }
-                break;
-            }
-            case 5: {
-                final char ch0 = str.charAt(0);
-                final char ch1 = str.charAt(1);
-                final char ch2 = str.charAt(2);
-                final char ch3 = str.charAt(3);
-                final char ch4 = str.charAt(4);
-                if ((ch0 == 'f' || ch0 == 'F') &&
-                    (ch1 == 'a' || ch1 == 'A') &&
-                    (ch2 == 'l' || ch2 == 'L') &&
-                    (ch3 == 's' || ch3 == 'S') &&
-                    (ch4 == 'e' || ch4 == 'E')) {
-                    return Boolean.FALSE;
-                }
-                break;
-            }
-        default:
-            break;
-        }
-
-        return null;
-    }
 
     /**
      * Converts a String to a Boolean throwing an exception if no match.
