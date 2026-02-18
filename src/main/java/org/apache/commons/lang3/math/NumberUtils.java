@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 package org.apache.commons.lang3.math;
-import org.apache.commons.lang3.time.BranchCoverage;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -580,173 +579,121 @@ public class NumberUtils {
      * @return {@code true} if the string is a correctly formatted number.
      * @since 3.5
      */
-    public static boolean isCreatable(final String str) {
-    //Branch 0:str is null or empty
-    if (StringUtils.isEmpty(str)) {
-        BranchCoverage.hit("isCreatable", 0);
-        return false;
-    }
-    //Branch 1: str is not empty
-    BranchCoverage.hit("isCreatable", 1);
-
-    final char[] chars = str.toCharArray();
-    int sz = chars.length;
-    boolean hasExp = false;
-    boolean hasDecPoint = false;
-    boolean allowSigns = false;
-    boolean foundDigit = false;
-    
-    // deal with any possible sign up front
-    // Branch 2 & 3: Ternary operator for sign (condition ? yes : no)
-    final int start;
-    if (isSign(chars[0])) {
-        BranchCoverage.hit("isCreatable", 2);
-        start = 1;
-    } else {
-        BranchCoverage.hit("isCreatable", 3);
-        start = 0;
-    }
-
-    //Branch 4: leading 0, skip if is a decimal number
-    if (sz > start + 1 && chars[start] == '0' && !StringUtils.contains(str, '.')) {
-        BranchCoverage.hit("isCreatable", 4);
-
-        //Branch 5: leading 0x/0X (Hexadecimal start)
-        if (chars[start + 1] == 'x' || chars[start + 1] == 'X') {
-            BranchCoverage.hit("isCreatable", 5);
-            int i = start + 2;
-            if (i == sz) {
-                BranchCoverage.hit("isCreatable", 6);
-                return false; // str == "0x"
-            }
-            BranchCoverage.hit("isCreatable", 7);
-            // checking hex (it can't be anything else)
-            for (; i < chars.length; i++) {
-                if (!CharUtils.isHex(chars[i])) {
-                    BranchCoverage.hit("isCreatable", 8);
-                    return false;
-                }
-            }
-            BranchCoverage.hit("isCreatable", 9);
-            return true;
-        }
-        
-        //Branch 10: Octal start
-        if (Character.isDigit(chars[start + 1])) {
-            BranchCoverage.hit("isCreatable", 10);
-            // leading 0, but not hex, must be octal
-            int i = start + 1;
-            for (; i < chars.length; i++) {
-                if (!CharUtils.isOctal(chars[i])) {
-                    BranchCoverage.hit("isCreatable", 11);
-                    return false;
-                }
-            }
-            BranchCoverage.hit("isCreatable", 12);
-            return true;
-        }
-        // Branch 13: Leading 0 but not hex or octal
-        BranchCoverage.hit("isCreatable", 13);
-    } else {
-        // Branch 14: Not a leading zero case (decimal etc)
-        BranchCoverage.hit("isCreatable", 14);
-    }
-
-    sz--; // don't want to loop to the last char, check it afterwards
-          // for type qualifiers
-    int i = start;
-    
-    // loop to the next to last char or to the last char if we need another digit to
-    // make a valid number (e.g. chars[0..5] = "1234E")
-    // Branch 15: While loop entered / Branch 16: While loop skipped
-    while (i < sz || i < sz + 1 && allowSigns && !foundDigit) {
-        BranchCoverage.hit("isCreatable", 15);
-        if (CharUtils.isAsciiNumeric(chars[i])) {
-            BranchCoverage.hit("isCreatable", 17);
-            foundDigit = true;
-            allowSigns = false;
-        } else if (chars[i] == '.') {
-            BranchCoverage.hit("isCreatable", 18);
-            if (hasDecPoint || hasExp) {
-                BranchCoverage.hit("isCreatable", 19);
-                // two decimal points or dec in exponent
-                return false;
-            }
-            hasDecPoint = true;
-        } else if (chars[i] == 'e' || chars[i] == 'E') {
-            BranchCoverage.hit("isCreatable", 20);
-            // we've already taken care of hex.
-            if (hasExp) {
-                BranchCoverage.hit("isCreatable", 21);
-                // two E's
-                return false;
-            }
-            if (!foundDigit) {
-                BranchCoverage.hit("isCreatable", 22);
-                return false;
-            }
-            hasExp = true;
-            allowSigns = true;
-        } else if (isSign(chars[i])) {
-            BranchCoverage.hit("isCreatable", 23);
-            if (!allowSigns) {
-                BranchCoverage.hit("isCreatable", 24);
-                return false;
-            }
-            allowSigns = false;
-            foundDigit = false; // we need a digit after the E
-        } else {
-            BranchCoverage.hit("isCreatable", 25);
+        public static boolean isCreatable(final String str) {
+        //start-value +1
+        if (StringUtils.isEmpty(str)) { //+1
             return false;
         }
-        i++;
-    }
-    BranchCoverage.hit("isCreatable", 16);
-
-    if (i < chars.length) {
-        BranchCoverage.hit("isCreatable", 26);
-        if (CharUtils.isAsciiNumeric(chars[i])) {
-            BranchCoverage.hit("isCreatable", 27);
-            // no type qualifier, OK
-            return true;
+        final char[] chars = str.toCharArray();
+        int sz = chars.length;
+        boolean hasExp = false;
+        boolean hasDecPoint = false;
+        boolean allowSigns = false;
+        boolean foundDigit = false;
+        // deal with any possible sign up front
+        //+1 cause of ternary operator
+        final int start = isSign(chars[0]) ? 1 : 0;
+        //+3
+        if (sz > start + 1 && chars[start] == '0' && !StringUtils.contains(str, '.')) { // leading 0, skip if is a decimal number
+            if (chars[start + 1] == 'x' || chars[start + 1] == 'X') { // leading 0x/0X //+2
+                return validateHexNumber(chars, start, sz);//+1
+            }
+            if (Character.isDigit(chars[start + 1])) {//+1
+                // leading 0, but not hex, must be octal
+                int i = start + 1;
+                for (; i < chars.length; i++) {//+1
+                    if (!CharUtils.isOctal(chars[i])) {//+1
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
-        if (chars[i] == 'e' || chars[i] == 'E') {
-            BranchCoverage.hit("isCreatable", 28);
-            // can't have an E at the last byte
-            return false;
-        }
-        if (chars[i] == '.') {
-            BranchCoverage.hit("isCreatable", 29);
-            if (hasDecPoint || hasExp) {
-                BranchCoverage.hit("isCreatable", 30);
-                // two decimal points or dec in exponent
+        sz--; // don't want to loop to the last char, check it afterwards
+              // for type qualifiers
+        int i = start;
+        // loop to the next to last char or to the last char if we need another digit to
+        // make a valid number (e.g. chars[0..5] = "1234E")
+        while (i < sz || i < sz + 1 && allowSigns && !foundDigit) {//+4
+            if (CharUtils.isAsciiNumeric(chars[i])) {//+1
+                foundDigit = true;
+                allowSigns = false;
+            } else if (chars[i] == '.') {//+1
+                if (hasDecPoint || hasExp) {//+2
+                    // two decimal points or dec in exponent
+                    return false;
+                }
+                hasDecPoint = true;
+            } else if (chars[i] == 'e' || chars[i] == 'E') {//+2
+                // we've already taken care of hex.
+                if (hasExp) {//+1
+                    // two E's
+                    return false;
+                }
+                if (!foundDigit) {//+1
+                    return false;
+                }
+                hasExp = true;
+                allowSigns = true;
+            } else if (isSign(chars[i])) {//+1
+                if (!allowSigns) {//+1
+                    return false;
+                }
+                allowSigns = false;
+                foundDigit = false; // we need a digit after the E
+            } else {//+1
                 return false;
             }
-            // single trailing decimal point after non-exponent is ok
-            return foundDigit;
+            i++;
         }
-        if (!allowSigns && (chars[i] == 'd' || chars[i] == 'D' || chars[i] == 'f' || chars[i] == 'F')) {
-            BranchCoverage.hit("isCreatable", 31);
-            return foundDigit;
+        if (i < chars.length) {//+1
+            return checkSuffix(chars, i, hasExp, hasDecPoint, allowSigns, foundDigit);
         }
-        if (chars[i] == 'l' || chars[i] == 'L') {
-            BranchCoverage.hit("isCreatable", 32);
-            // not allowing L with an exponent or decimal point
-            boolean result = foundDigit && !hasExp && !hasDecPoint;
-            if (result) BranchCoverage.hit("isCreatable", 33);
-            else BranchCoverage.hit("isCreatable", 34);
-            return result;
-        }
-        // last character is illegal
-        BranchCoverage.hit("isCreatable", 35);
-        return false;
+        // allowSigns is true iff the val ends in 'E'
+        // found digit it to make sure weird stuff like '.' and '1E-' doesn't pass
+        return !allowSigns && foundDigit;//+1
     }
-    
-    // allowSigns is true iff the val ends in 'E'
-    // found digit it to make sure weird stuff like '.' and '1E-' doesn't pass
-    BranchCoverage.hit("isCreatable", 36);
-    return !allowSigns && foundDigit;
-}
+    private static boolean validateHexNumber(final char[] chars, final int start, final int sz) {
+        //Start value +1
+        int i = start + 2;
+        if (i == sz) {//+1
+            return false; // str == "0x"
+        }
+        // checking hex (it can't be anything else)
+        for (; i < chars.length; i++) {//+1
+            if (!CharUtils.isHex(chars[i])) {//+1
+                return false;
+            }
+        }
+        return true;
+    }
+    private static boolean checkSuffix(final char[] chars, final int i, final boolean hasExp, final boolean hasDecPoint, final boolean allowSigns, final boolean foundDigit) {
+        if (CharUtils.isAsciiNumeric(chars[i])) {//+1
+                // no type qualifier, OK
+                return true;
+            }
+            if (chars[i] == 'e' || chars[i] == 'E') {//+2
+                // can't have an E at the last byte
+                return false;
+            }
+            if (chars[i] == '.') {//+1
+                if (hasDecPoint || hasExp) {//+2
+                    // two decimal points or dec in exponent
+                    return false;
+                }
+                // single trailing decimal point after non-exponent is ok
+                return foundDigit;
+            }
+            if (!allowSigns && (chars[i] == 'd' || chars[i] == 'D' || chars[i] == 'f' || chars[i] == 'F')) {//+5
+                return foundDigit;
+            }
+            if (chars[i] == 'l' || chars[i] == 'L') {//+2
+                // not allowing L with an exponent or decimal point
+                return foundDigit && !hasExp && !hasDecPoint;//+2
+            }
+            // last character is illegal
+            return false;
+    }
 
     /**
      * Checks whether the {@link String} contains only digit characters.
