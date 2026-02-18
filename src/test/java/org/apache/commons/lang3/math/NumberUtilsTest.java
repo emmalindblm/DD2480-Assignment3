@@ -571,21 +571,21 @@ class NumberUtilsTest extends AbstractLangTest {
             "createLong(\"" + str + "\") should have failed.");
     }
 
-	@Test
-	// Covers the branch where a numeric string with 'L' suffix starts with '-' but contains non-digit characters.
-	// This forces the boolean expression checking digits after the sign to evaluate to false.
-	void testCreateNumberInvalidNegativeLongSuffix() {
-		assertThrows(NumberFormatException.class,
-					 () -> NumberUtils.createNumber("-12aL"));
-	}
+    @Test
+    // Covers the branch where a numeric string with 'L' suffix starts with '-' but contains non-digit characters.
+    // This forces the boolean expression checking digits after the sign to evaluate to false.
+    void testCreateNumberInvalidNegativeLongSuffix() {
+        assertThrows(NumberFormatException.class,
+                     () -> NumberUtils.createNumber("-12aL"));
+    }
 
-	@Test
-	// Covers the branch where Double.isInfinite() becomes true due to overflow,
-	// forcing the method to fall back to BigDecimal.
-	void testCreateNumberDoubleOverflowFallsBackToBigDecimal() {
-		final Number result = NumberUtils.createNumber("1e400D");
-		assertInstanceOf(BigDecimal.class, result);
-	}
+    @Test
+    // Covers the branch where Double.isInfinite() becomes true due to overflow,
+    // forcing the method to fall back to BigDecimal.
+    void testCreateNumberDoubleOverflowFallsBackToBigDecimal() {
+        final Number result = NumberUtils.createNumber("1e400D");
+        assertInstanceOf(BigDecimal.class, result);
+    }
 
     @Test
     void testCreateNumber() {
