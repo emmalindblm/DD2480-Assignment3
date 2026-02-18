@@ -26,7 +26,6 @@ import java.util.function.Consumer;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.time.BranchCoverage;
 
 /**
  * Provides extra functionality for Java Number classes.
@@ -584,11 +583,11 @@ public class NumberUtils {
     public static boolean isCreatable(final String str) {
     //Branch 0:str is null or empty
     if (StringUtils.isEmpty(str)) {
-        BranchCoverage.hit("isCreatable", 0);
+        //BranchCoverage.hit("isCreatable", 0);
         return false;
     }
     //Branch 1: str is not empty
-    BranchCoverage.hit("isCreatable", 1);
+    //BranchCoverage.hit("isCreatable", 1);
 
     final char[] chars = str.toCharArray();
     int sz = chars.length;
@@ -601,56 +600,56 @@ public class NumberUtils {
     // Branch 2 & 3: Ternary operator for sign (condition ? yes : no)
     final int start;
     if (isSign(chars[0])) {
-        BranchCoverage.hit("isCreatable", 2);
+        //BranchCoverage.hit("isCreatable", 2);
         start = 1;
     } else {
-        BranchCoverage.hit("isCreatable", 3);
+        //BranchCoverage.hit("isCreatable", 3);
         start = 0;
     }
 
     //Branch 4: leading 0, skip if is a decimal number
     if (sz > start + 1 && chars[start] == '0' && !StringUtils.contains(str, '.')) {
-        BranchCoverage.hit("isCreatable", 4);
+        //BranchCoverage.hit("isCreatable", 4);
 
         //Branch 5: leading 0x/0X (Hexadecimal start)
         if (chars[start + 1] == 'x' || chars[start + 1] == 'X') {
-            BranchCoverage.hit("isCreatable", 5);
+            //BranchCoverage.hit("isCreatable", 5);
             int i = start + 2;
             if (i == sz) {
-                BranchCoverage.hit("isCreatable", 6);
+                //BranchCoverage.hit("isCreatable", 6);
                 return false; // str == "0x"
             }
-            BranchCoverage.hit("isCreatable", 7);
+            //BranchCoverage.hit("isCreatable", 7);
             // checking hex (it can't be anything else)
             for (; i < chars.length; i++) {
                 if (!CharUtils.isHex(chars[i])) {
-                    BranchCoverage.hit("isCreatable", 8);
+                    //BranchCoverage.hit("isCreatable", 8);
                     return false;
                 }
             }
-            BranchCoverage.hit("isCreatable", 9);
+            //BranchCoverage.hit("isCreatable", 9);
             return true;
         }
 
         //Branch 10: Octal start
         if (Character.isDigit(chars[start + 1])) {
-            BranchCoverage.hit("isCreatable", 10);
+            //BranchCoverage.hit("isCreatable", 10);
             // leading 0, but not hex, must be octal
             int i = start + 1;
             for (; i < chars.length; i++) {
                 if (!CharUtils.isOctal(chars[i])) {
-                    BranchCoverage.hit("isCreatable", 11);
+                    //BranchCoverage.hit("isCreatable", 11);
                     return false;
                 }
             }
-            BranchCoverage.hit("isCreatable", 12);
+            //BranchCoverage.hit("isCreatable", 12);
             return true;
         }
         // Branch 13: Leading 0 but not hex or octal
-        BranchCoverage.hit("isCreatable", 13);
+        //BranchCoverage.hit("isCreatable", 13);
     } else {
         // Branch 14: Not a leading zero case (decimal etc)
-        BranchCoverage.hit("isCreatable", 14);
+        //BranchCoverage.hit("isCreatable", 14);
     }
 
     sz--; // don't want to loop to the last char, check it afterwards
@@ -661,65 +660,65 @@ public class NumberUtils {
     // make a valid number (e.g. chars[0..5] = "1234E")
     // Branch 15: While loop entered / Branch 16: While loop skipped
     while (i < sz || i < sz + 1 && allowSigns && !foundDigit) {
-        BranchCoverage.hit("isCreatable", 15);
+        //BranchCoverage.hit("isCreatable", 15);
         if (CharUtils.isAsciiNumeric(chars[i])) {
-            BranchCoverage.hit("isCreatable", 17);
+            //BranchCoverage.hit("isCreatable", 17);
             foundDigit = true;
             allowSigns = false;
         } else if (chars[i] == '.') {
-            BranchCoverage.hit("isCreatable", 18);
+            //BranchCoverage.hit("isCreatable", 18);
             if (hasDecPoint || hasExp) {
-                BranchCoverage.hit("isCreatable", 19);
+                //BranchCoverage.hit("isCreatable", 19);
                 // two decimal points or dec in exponent
                 return false;
             }
             hasDecPoint = true;
         } else if (chars[i] == 'e' || chars[i] == 'E') {
-            BranchCoverage.hit("isCreatable", 20);
+            //BranchCoverage.hit("isCreatable", 20);
             // we've already taken care of hex.
             if (hasExp) {
-                BranchCoverage.hit("isCreatable", 21);
+                //BranchCoverage.hit("isCreatable", 21);
                 // two E's
                 return false;
             }
             if (!foundDigit) {
-                BranchCoverage.hit("isCreatable", 22);
+                //BranchCoverage.hit("isCreatable", 22);
                 return false;
             }
             hasExp = true;
             allowSigns = true;
         } else if (isSign(chars[i])) {
-            BranchCoverage.hit("isCreatable", 23);
+            //BranchCoverage.hit("isCreatable", 23);
             if (!allowSigns) {
-                BranchCoverage.hit("isCreatable", 24);
+                //BranchCoverage.hit("isCreatable", 24);
                 return false;
             }
             allowSigns = false;
             foundDigit = false; // we need a digit after the E
         } else {
-            BranchCoverage.hit("isCreatable", 25);
+            //BranchCoverage.hit("isCreatable", 25);
             return false;
         }
         i++;
     }
-    BranchCoverage.hit("isCreatable", 16);
+    //BranchCoverage.hit("isCreatable", 16);
 
     if (i < chars.length) {
-        BranchCoverage.hit("isCreatable", 26);
+        //BranchCoverage.hit("isCreatable", 26);
         if (CharUtils.isAsciiNumeric(chars[i])) {
-            BranchCoverage.hit("isCreatable", 27);
+            //BranchCoverage.hit("isCreatable", 27);
             // no type qualifier, OK
             return true;
         }
         if (chars[i] == 'e' || chars[i] == 'E') {
-            BranchCoverage.hit("isCreatable", 28);
+            //BranchCoverage.hit("isCreatable", 28);
             // can't have an E at the last byte
             return false;
         }
         if (chars[i] == '.') {
-            BranchCoverage.hit("isCreatable", 29);
+            //BranchCoverage.hit("isCreatable", 29);
             if (hasDecPoint || hasExp) {
-                BranchCoverage.hit("isCreatable", 30);
+                //BranchCoverage.hit("isCreatable", 30);
                 // two decimal points or dec in exponent
                 return false;
             }
@@ -727,28 +726,28 @@ public class NumberUtils {
             return foundDigit;
         }
         if (!allowSigns && (chars[i] == 'd' || chars[i] == 'D' || chars[i] == 'f' || chars[i] == 'F')) {
-            BranchCoverage.hit("isCreatable", 31);
+            //BranchCoverage.hit("isCreatable", 31);
             return foundDigit;
         }
         if (chars[i] == 'l' || chars[i] == 'L') {
-            BranchCoverage.hit("isCreatable", 32);
+            //BranchCoverage.hit("isCreatable", 32);
             // not allowing L with an exponent or decimal point
             final boolean result = foundDigit && !hasExp && !hasDecPoint;
             if (result) {
-                BranchCoverage.hit("isCreatable", 33);
+                //BranchCoverage.hit("isCreatable", 33);
             } else {
-                BranchCoverage.hit("isCreatable", 34);
+                //BranchCoverage.hit("isCreatable", 34);
             }
             return result;
         }
         // last character is illegal
-        BranchCoverage.hit("isCreatable", 35);
+        //BranchCoverage.hit("isCreatable", 35);
         return false;
     }
 
     // allowSigns is true iff the val ends in 'E'
     // found digit it to make sure weird stuff like '.' and '1E-' doesn't pass
-    BranchCoverage.hit("isCreatable", 36);
+    //BranchCoverage.hit("isCreatable", 36);
     return !allowSigns && foundDigit;
 }
 
