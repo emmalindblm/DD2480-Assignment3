@@ -27,7 +27,6 @@ import java.util.function.Consumer;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.time.BranchCoverage;
 
 /**
  * Provides extra functionality for Java Number classes.
