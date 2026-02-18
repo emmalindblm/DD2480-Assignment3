@@ -868,7 +868,7 @@ class RandomStringUtilsTest extends AbstractLangTest {
     @ParameterizedTest
     @MethodSource("randomProvider")
     void testLettersAndDigitsTriggersAsciiOptimization() {
-        String result = RandomStringUtils.random(10, 'A', 'B', true, true, null, new Random());
+        final String result = RandomStringUtils.random(10, 'A', 'B', true, true, null, new Random());
         assertEquals(10, result.length());
         assertTrue(result.matches("[A-Za-z0-9]+"));
     }
