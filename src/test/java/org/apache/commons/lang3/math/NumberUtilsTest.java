@@ -2053,13 +2053,13 @@ class NumberUtilsTest extends AbstractLangTest {
         // We need a string that bypasses the "if (i < chars.length)" block at the very end
         assertTrue(NumberUtils.isCreatable("2."), "Branch 36: '2.' should reach the final return statement");
     }
-    @org.junit.jupiter.api.AfterAll
+    /*@org.junit.jupiter.api.AfterAll
     public static void reportDIYCoverage() {
         System.out.println("--------------------------------------------------");
         System.out.println("FINAL DIY BRANCH COVERAGE REPORT FOR ISCREATABLE");
         org.apache.commons.lang3.time.BranchCoverage.report("isCreatable");
         System.out.println("--------------------------------------------------");
-    }
+    }*/
 }
 
 
