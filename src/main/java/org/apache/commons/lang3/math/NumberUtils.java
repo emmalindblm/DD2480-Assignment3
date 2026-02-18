@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 package org.apache.commons.lang3.math;
-import org.apache.commons.lang3.time.BranchCoverage;
+
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -26,6 +26,7 @@ import java.util.function.Consumer;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.time.BranchCoverage;
 
 /**
  * Provides extra functionality for Java Number classes.
@@ -595,7 +596,7 @@ public class NumberUtils {
     boolean hasDecPoint = false;
     boolean allowSigns = false;
     boolean foundDigit = false;
-    
+
     // deal with any possible sign up front
     // Branch 2 & 3: Ternary operator for sign (condition ? yes : no)
     final int start;
@@ -630,7 +631,7 @@ public class NumberUtils {
             BranchCoverage.hit("isCreatable", 9);
             return true;
         }
-        
+
         //Branch 10: Octal start
         if (Character.isDigit(chars[start + 1])) {
             BranchCoverage.hit("isCreatable", 10);
@@ -655,7 +656,7 @@ public class NumberUtils {
     sz--; // don't want to loop to the last char, check it afterwards
           // for type qualifiers
     int i = start;
-    
+
     // loop to the next to last char or to the last char if we need another digit to
     // make a valid number (e.g. chars[0..5] = "1234E")
     // Branch 15: While loop entered / Branch 16: While loop skipped
@@ -732,16 +733,19 @@ public class NumberUtils {
         if (chars[i] == 'l' || chars[i] == 'L') {
             BranchCoverage.hit("isCreatable", 32);
             // not allowing L with an exponent or decimal point
-            boolean result = foundDigit && !hasExp && !hasDecPoint;
-            if (result) BranchCoverage.hit("isCreatable", 33);
-            else BranchCoverage.hit("isCreatable", 34);
+            final boolean result = foundDigit && !hasExp && !hasDecPoint;
+            if (result) {
+                BranchCoverage.hit("isCreatable", 33);
+            } else {
+                BranchCoverage.hit("isCreatable", 34);
+            }
             return result;
         }
         // last character is illegal
         BranchCoverage.hit("isCreatable", 35);
         return false;
     }
-    
+
     // allowSigns is true iff the val ends in 'E'
     // found digit it to make sure weird stuff like '.' and '1E-' doesn't pass
     BranchCoverage.hit("isCreatable", 36);
@@ -1868,7 +1872,7 @@ public class NumberUtils {
     public NumberUtils() {
         // empty
     }
-    
+
 
 
 }

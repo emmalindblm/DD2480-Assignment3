@@ -2026,15 +2026,13 @@ class NumberUtilsTest extends AbstractLangTest {
         assertEquals(5, NumberUtils.toShort(null, (short) 5));
     }
   @Test
-    void testRejectEmptyHexPrefix()
-    {
+    void testRejectEmptyHexPrefix() {
         // Requirement: Hexadecimal strings must contain digits after the '0x' prefix.
         //Covers Branch 6
-       assertFalse(NumberUtils.isCreatable("0x"), "Should return false for an empty hex prefix '0x'"); 
+       assertFalse(NumberUtils.isCreatable("0x"), "Should return false for an empty hex prefix '0x'");
     }
     @Test
-    void testRejectMultipleExponents()
-    {
+    void testRejectMultipleExponents() {
         // Requirement: A numeric string cannot contain more than one exponent marker ('e' or 'E').
         //Covers Branch 7
         assertFalse(NumberUtils.isCreatable("1e1e1"), "Should return false for multiple exponent markers");
@@ -2062,6 +2060,6 @@ class NumberUtilsTest extends AbstractLangTest {
     }
 }
 
-  
+
 
 
