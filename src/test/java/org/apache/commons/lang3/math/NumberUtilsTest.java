@@ -2025,4 +2025,11 @@ class NumberUtilsTest extends AbstractLangTest {
         assertEquals(5, NumberUtils.toShort("", (short) 5));
         assertEquals(5, NumberUtils.toShort(null, (short) 5));
     }
+    @org.junit.jupiter.api.AfterAll
+    public static void reportDIYCoverage() {
+        System.out.println("--------------------------------------------------");
+        System.out.println("FINAL DIY BRANCH COVERAGE REPORT FOR ISCREATABLE");
+        org.apache.commons.lang3.time.BranchCoverage.report("isCreatable");
+        System.out.println("--------------------------------------------------");
+    }
 }
