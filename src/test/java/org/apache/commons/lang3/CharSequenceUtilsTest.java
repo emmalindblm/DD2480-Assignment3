@@ -67,7 +67,8 @@ class CharSequenceUtilsTest extends AbstractLangTest {
         final boolean expected;
         final Class<? extends Throwable> throwable;
 
-        TestData(final String source, final boolean ignoreCase, final int toffset, final String other, final int ooffset, final int len,
+        TestData(final String source, final boolean ignoreCase, final int toffset, final String other,
+                final int ooffset, final int len,
                 final boolean expected) {
             this.source = source;
             this.ignoreCase = ignoreCase;
@@ -79,7 +80,8 @@ class CharSequenceUtilsTest extends AbstractLangTest {
             this.throwable = null;
         }
 
-        TestData(final String source, final boolean ignoreCase, final int toffset, final String other, final int ooffset, final int len,
+        TestData(final String source, final boolean ignoreCase, final int toffset, final String other,
+                final int ooffset, final int len,
                 final Class<? extends Throwable> throwable) {
             this.source = source;
             this.ignoreCase = ignoreCase;
@@ -190,7 +192,8 @@ class CharSequenceUtilsTest extends AbstractLangTest {
 
     @ParameterizedTest
     @MethodSource("lastIndexWithStandardCharSequence")
-    void testLastIndexOfWithDifferentCharSequences(final CharSequence cs, final CharSequence search, final int start, final int expected) {
+    void testLastIndexOfWithDifferentCharSequences(final CharSequence cs, final CharSequence search, final int start,
+            final int expected) {
         assertEquals(expected, CharSequenceUtils.lastIndexOf(cs, search, start));
     }
 
@@ -264,13 +267,15 @@ class CharSequenceUtilsTest extends AbstractLangTest {
             new RunTest() {
                 @Override
                 boolean invoke() {
-                    return CharSequenceUtils.regionMatches(data.source, data.ignoreCase, data.toffset, data.other, data.ooffset, data.len);
+                    return CharSequenceUtils.regionMatches(data.source, data.ignoreCase, data.toffset, data.other,
+                            data.ooffset, data.len);
                 }
             }.run(data, "CSString");
             new RunTest() {
                 @Override
                 boolean invoke() {
-                    return CharSequenceUtils.regionMatches(new StringBuilder(data.source), data.ignoreCase, data.toffset, data.other, data.ooffset, data.len);
+                    return CharSequenceUtils.regionMatches(new StringBuilder(data.source), data.ignoreCase,
+                            data.toffset, data.other, data.ooffset, data.len);
                 }
             }.run(data, "CSNonString");
         }
@@ -312,4 +317,18 @@ class CharSequenceUtilsTest extends AbstractLangTest {
         assertArrayEquals(expected, CharSequenceUtils.toCharArray(builder.toString()));
         assertArrayEquals(ArrayUtils.EMPTY_CHAR_ARRAY, CharSequenceUtils.toCharArray(null));
     }
+
+    @Test
+    void testToCharArray_StringBuffer() {
+        final StringBuffer buffer = new StringBuffer("test");
+        final char[] expected = new char[] { 't', 'e', 's', 't' };
+        assertArrayEquals(expected, CharSequenceUtils.toCharArray(buffer));
+    }
+
+    @Test
+    void testToCharArray_NonStringCharSequence() {
+        final CharSequence input = new CharSequenceUtilsTest.WrapperString("test");
+        assertArrayEquals(new char[] { 't', 'e', 's', 't' }, CharSequenceUtils.toCharArray(input));
+    }
+
 }
