@@ -1171,4 +1171,34 @@ class BooleanUtilsTest extends AbstractLangTest {
                 BooleanUtils.xor(new boolean[] { true, true, true }),
                 "true ^ true ^ true");
     }
+    // --- ADD THIS TO THE BOTTOM OF BooleanUtilsTest.java ---
+
+    @Test
+    void testToBooleanObject_String_SwitchCoverage() {
+        // These tests specifically target the cases in your new switch statement
+        // Length 1
+        assertEquals(Boolean.TRUE, BooleanUtils.toBooleanObject("y"));
+        assertEquals(Boolean.FALSE, BooleanUtils.toBooleanObject("n"));
+        assertNull(BooleanUtils.toBooleanObject("z"));
+
+        // Length 2
+        assertEquals(Boolean.TRUE, BooleanUtils.toBooleanObject("on"));
+        assertEquals(Boolean.FALSE, BooleanUtils.toBooleanObject("no"));
+        assertNull(BooleanUtils.toBooleanObject("oo"));
+
+        // Length 3
+        assertEquals(Boolean.TRUE, BooleanUtils.toBooleanObject("yes"));
+        assertEquals(Boolean.FALSE, BooleanUtils.toBooleanObject("off"));
+        assertNull(BooleanUtils.toBooleanObject("yep"));
+
+        // Length 4
+        assertEquals(Boolean.TRUE, BooleanUtils.toBooleanObject("true"));
+        assertEquals(Boolean.TRUE, BooleanUtils.toBooleanObject("TRUE"));
+        assertNull(BooleanUtils.toBooleanObject("tree"));
+
+        // Length 5
+        assertEquals(Boolean.FALSE, BooleanUtils.toBooleanObject("false"));
+        assertEquals(Boolean.FALSE, BooleanUtils.toBooleanObject("FALSE"));
+        assertNull(BooleanUtils.toBooleanObject("falsy"));
+    }
 }
