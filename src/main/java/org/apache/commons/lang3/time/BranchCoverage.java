@@ -28,21 +28,22 @@ public final class BranchCoverage {
     private static final Map<String, boolean[]> COVERAGE = new LinkedHashMap<>();
     private static final int MAX_BRANCHES = 100;
 
-    private BranchCoverage() {}
+    private BranchCoverage() {
+    }
 
-    /** Mark branch {@code branchId} of {@code functionName} as reached. 
-     * 
+    /**
+     * Mark branch {@code branchId} of {@code functionName} as reached.
      * @param functionName the name of the instrumented function.
-     * @param branchId the unique ID of the reached branch.
-    */
+     * @param branchId     the unique ID of the reached branch.
+     */
     public static void hit(final String functionName, final int branchId) {
         COVERAGE.computeIfAbsent(functionName, k -> new boolean[MAX_BRANCHES])[branchId] = true;
     }
 
-    /** Print which branch IDs were covered for {@code functionName}. 
-     * 
+    /**
+     * Print which branch IDs were covered for {@code functionName}.
      * @param functionName the name of the instrumented function.
-    */
+     */
     public static void report(final String functionName) {
         final boolean[] hits = COVERAGE.get(functionName);
         if (hits == null) {
