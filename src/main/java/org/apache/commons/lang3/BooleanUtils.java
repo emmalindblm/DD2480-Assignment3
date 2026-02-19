@@ -37,6 +37,9 @@ import org.apache.commons.lang3.math.NumberUtils;
 public class BooleanUtils {
 
     // --- ADDED FOR ASSIGNMENT (MANUAL INSTRUMENTATION) ---
+    /**
+     * Records the branches visited during manual instrumentation.
+     */
     public static java.util.HashSet<Integer> visitedBranches = new java.util.HashSet<Integer>();
     // -----------------------------------------------------
 
@@ -1244,5 +1247,4 @@ public class BooleanUtils {
     public BooleanUtils() {
         // empty
     }
-
 }
