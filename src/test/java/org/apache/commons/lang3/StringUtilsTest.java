@@ -3177,4 +3177,9 @@ class StringUtilsTest extends AbstractLangTest {
         assertSame("ab/ab", StringUtils.wrapIfMissing("ab/ab", "ab"));
         assertSame("//x//", StringUtils.wrapIfMissing("//x//", "//"));
     }
+    @Test
+    public void testLevenshteinThresholdExceededWithEmptyString() {
+        // n = 0 (tom sträng), m = 5 ("ABCDE")
+        assertEquals(-1, StringUtils.getLevenshteinDistance("", "ABCDE", 2));
+    }
 }
